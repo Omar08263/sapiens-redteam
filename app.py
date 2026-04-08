@@ -1,32 +1,39 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import json
-from datetime import datetime
-from openai import OpenAI
-import time
-from fpdf import FPDF
+import google.generativeai as genai
 
-st.set_page_config(page_title="SAPIENS-RED-TEAM v2.0", layout="wide", page_icon="🛡️")
-st.title("🛡️ SAPIENS-RED-TEAM Ultimate Research Suite v2.0 — God Mode")
+# إعدادات الصفحة واللوجو
+st.set_page_config(page_title="SAPIENS-RED-TEAM", layout="wide")
+st.title("🛡️ SAPIENS-RED-TEAM Ultimate Research Suite v2.0")
 
-openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# جلب المفتاح السري من الإعدادات
+try:
+    google_api_key = st.secrets["GOOGLE_API_KEY"]
+    genai.configure(api_key=google_api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+except:
+    st.error("⚠️ خطأ: مفتاح GOOGLE_API_KEY غير موجود في Secrets!")
+    st.stop()
 
-if 'df_timeline' not in st.session_state:
-    st.session_state.df_timeline = pd.DataFrame()
-
-df = st.session_state.df_timeline
-
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📤 Upload & Dashboard", "🚀 Run New Campaign", "📊 Deep Analysis", "🧠 AI Analyst", "⚙️ Settings & Reports"])
+# التبويبات (Tabs)
+tab1, tab2, tab3 = st.tabs(["📥 Upload & Dashboard", "🚀 Run New Campaign", "🧠 AI Analyst"])
 
 with tab1:
-    st.subheader("تحميل البيانات")
-    uploaded_file = st.file_uploader("CSV أو JSON", type=["csv", "json"])
+    st.header("تحميل البيانات")
+    uploaded_file = st.file_uploader("ارفع ملف CSV أو JSON", type=['csv', 'json'])
     if uploaded_file:
-        # (الكود كامل زي ما بعثته قبل كده - لو عايز النسخة الكاملة 100% قولي "ابعث الكود كامل تاني" وأبعته)
-        pass  # هنا هتحط الكود الكامل اللي بعثته في الرسالة السابقة
+        st.success("تم تحميل الملف بنجاح! جاهز للتحليل.")
 
-# (الباقي كامل من الكود اللي بعثته قبل كده - لو وصلت للصفحة ومحتاج الكود كامل أرسلهولك سطر سطر)
+with tab2:
+    st.header("بدء مهمة جديدة")
+    campaign_goal = st.text_area("صف هدف المهمة أو النطاق المستهدف:")
+    if st.button("بدء التحليل"):
+        if campaign_goal:
+            response = model.generate_content(f"كخبير Red Teaming، حلل هذا الهدف: {campaign_goal}")
+            st.markdown(response.text)
 
-    st.caption("Made with ❤️ for the strongest Red Team")
+with tab3:
+    st.header("المحلل الذكي (Chat)")
+    user_query = st.text_input("اسأل الذكي الاصطناعي عن أي ثغرة أو كود:")
+    if user_query:
+        response = model.generate_content(user_query)
+        st.write(response.text)
