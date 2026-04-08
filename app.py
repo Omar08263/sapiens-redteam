@@ -10,7 +10,7 @@ try:
     google_api_key = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=google_api_key)
     model = genai.GenerativeModel('gemini-1.0-pro')
-except:
+except:model = genai.GenerativeModel('gemini-1.5-flash')
     st.error("⚠️ خطأ: مفتاح GOOGLE_API_KEY غير موجود في Secrets!")
     st.stop()
 
