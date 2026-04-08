@@ -9,8 +9,15 @@ st.title("🛡️ SAPIENS-RED-TEAM Ultimate Research Suite v2.0")
 try:
     google_api_key = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=google_api_key)
-    model = genai.GenerativeModel('gemini-1.0-pro')
-except:model = genai.GenerativeModel('gemini-1.5-flash')
+    # جلب المفتاح السري من الإعدادات
+try:
+    google_api_key = st.secrets["GOOGLE_API_KEY"]
+    genai.configure(api_key=google_api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+except Exception as e:
+    st.error(f"⚠️ خطأ في الإعدادات: {e}")
+    st.stop()
+    
     st.error("⚠️ خطأ: مفتاح GOOGLE_API_KEY غير موجود في Secrets!")
     st.stop()
 
